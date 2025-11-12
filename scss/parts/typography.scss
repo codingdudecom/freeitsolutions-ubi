@@ -1,0 +1,46 @@
+@import url('https://fonts.cdnfonts.com/css/neue-helvetica-bq');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+$font-family-serif: 'Source Serif Pro', Georgia, Cambria, "Times New Roman", Times, serif;
+$font-family-sans-serif: sohne, 'Neue Helvetica BQ', Helvetica, Arial, sans-serif;
+
+body {
+  font-family: $font-family-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-align:left;
+}
+
+h1 {
+  font-family: $font-family-sans-serif;
+  font-size: 42px;
+  font-style: normal;
+  font-weight: 700;
+  -webkit-font-smoothing: antialiased;
+  margin-top: 1.19em;
+}
+
+h2 {
+  font-family: $font-family-sans-serif;
+  margin-top: 0.92em;
+  font-weight: 600;
+  font-size:24px;
+}
+
+.pitch h2{
+  font-size:30px;
+}
+
+h3, h4, h5, h6 {
+  font-family: $font-family-sans-serif;
+  font-size:20px!important;
+  font-weight: 600;
+}
+
+a {
+  font-weight:700;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 1px;
+}

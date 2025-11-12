@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    {{#if robots}}
+    <meta name="robots" content="{{robots}}" />
+    {{else}}
+    <meta name="robots" content="index,follow" />
+    {{/if}}
+    {{#if canonical}}<link rel="canonical" href="{{canonical}}" />{{/if}}
+    <script type="text/javascript">
+      var disquss = true;
+      var c = '{{canonical}}';
+      
+      if (c.indexOf('/blog/') < 0 || c.indexOf('/blog/')+6 >= c.length){
+        disquss = false;
+      };
+      var disqus_config = function () {
+        if (!disquss){
+          return;
+        }
+      this.page.url = '{{canonical}}';  // Replace PAGE_URL with your page's canonical URL variable
+      this.page.identifier = '{{canonical}}'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+      };
+    </script>
+    <meta name="description" content="{{description}}">
+    <meta name="robots" content="max-image-preview:large" />
+    {{#if tags}}<meta name="keywords" content="{{tags}}" />{{/if}}
+    
+    <link rel="preload" href="/css/style.min.css" as="style">
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <meta property="og:title" content="{{title}}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="FreeITSolutions" />
+    <meta property="article:section" content="Technology" />
+    {{#if tags}}<meta property="article:tag" content="{{tags}}" />{{/if}}
+    {{#if canonical}}<meta property="og:url" content="{{canonical}}" />{{/if}}
+    <meta property="og:description" content="{{description}}" />
+    {{#if featured_image}}<meta property="og:image" content="{{#absolutePath featured_image}}{{/absolutePath}}" />{{/if}}
+    {{#if canonical}}<meta name="og:url" content="{{canonical}}">{{/if}}
+
+    <meta name="twitter:site" content="@NikGenerator">
+    <meta name="twitter:creator" content="@codingdudecom">
+    <meta name="twitter:title" content="{{title}}">
+    <meta name="twitter:description" content="{{description}}">
+    <meta http-equiv="last-modified" content="{{date}}">
+
+    {{#if featured_image}}
+    <meta name="twitter:image" content="{{#absolutePath featured_image}}{{/absolutePath}}">
+    <meta name="twitter:image:alt" content="{{title}}">
+    <meta name="twitter:card" content="summary_large_image">
+    {{else}}
+    <meta name="twitter:card" content="summary">
+    {{/if}}
+</head>
+<body class="d-flex h-100 {{bodyClass}}">
+        <header class="mb-auto p-3">
+            {{>topMenu}}
+          </header>
+        
+        <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+          
+        {{#if close}}</div>{{/if}}

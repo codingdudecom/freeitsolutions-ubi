@@ -1,0 +1,27 @@
+{
+  "name": "freeit-ubi",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "build-css1": "node-sass --include-path scss scss/main.scss docs/css/style.min.css --output-style compressed",
+    "build-css": "sass scss/main.scss docs/css/style.min.css --style=compressed",
+    "build-js": "browserify js/main.js>docs/js/main.min.js",
+    "generate-html": "node ./build-pages.js",
+    "build": "npm run build-css && npm run build-js && npm run generate-html",
+    "server": "http-server docs",
+    "start": "nodemon -e js,scss,html -x \"npm run build && npm run server\" --ignore docs/"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "hbs": "^4.1.2",
+    "nodemon": "^2.0.7"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1",
+    "sass": "^1.80.7"
+  }
+}

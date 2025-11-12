@@ -1,0 +1,15 @@
+{{>header 
+	title='Latest Articles'
+	description='Navigating the Future of Work in the Age of AI'
+	bodyClass='blogRoll' close='true'}}
+
+	{{#article}}
+		{{>blogPostHeader
+			title='Latest Articles'
+			description='Navigating the Future of Work in the Age of AI'
+		}}
+		{{#articleContent}}
+		{{>blogRoll offset="0" limit="10"}}
+		{{/articleContent}}
+	{{/article}}
+{{>footer close='true'}}
