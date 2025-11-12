@@ -29,7 +29,7 @@ function htmlDecode(input){
 
 window.addEventListener('load', pageLoaded);
 
-function pageLoaded() {
+window.pageLoaded = function () {
   const heroMediaContainer = document.getElementById('hero-media');
   if (heroMediaContainer) {
     const video = document.createElement('video');
