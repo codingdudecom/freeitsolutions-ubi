@@ -27,7 +27,9 @@ function htmlDecode(input){
   return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
 }
 
-window.addEventListener('load', function() {
+window.addEventListener('load', pageLoaded);
+
+function pageLoaded() {
   const heroMediaContainer = document.getElementById('hero-media');
   if (heroMediaContainer) {
     const video = document.createElement('video');
@@ -43,34 +45,5 @@ window.addEventListener('load', function() {
     heroMediaContainer.appendChild(video);
   }
 
-  fixForGithub();
-});
-
-
-function fixForGithub(){
-    (function() {
-      // Only run on GitHub Pages
-      if (!window.location.hostname.endsWith("github.io")) return;
-
-      const repo = window.location.pathname.split('/')[1]; // first folder = repo name
-
-      // Helper to fix elements with src or href attributes
-      const fixPath = (selector, attr) => {
-        document.querySelectorAll(selector).forEach(el => {
-          const val = el.getAttribute(attr);
-          if (val && val.startsWith('/')) {
-            el.setAttribute(attr, `/${repo}${val}`);
-          }
-        });
-      };
-
-      // Fix CSS
-      fixPath('link[rel="stylesheet"], link[rel="preload"][as="style"]', 'href');
-      // Fix JS
-      fixPath('script[src]', 'src');
-      // Fix images
-      fixPath('img[src]', 'src');
-      //Fix video
-      fixPath('video[src]', 'src');
-    })();
+  
 }
