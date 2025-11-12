@@ -189,9 +189,9 @@ header + div {
     </script>
     
     <script>
-      pageLoaded();
       fixForGithub();
       function fixForGithub(){
+          pageLoaded();
           (function() {
             // Only run on GitHub Pages
             if (!window.location.hostname.endsWith("github.io")) return;
