@@ -42,6 +42,8 @@ window.addEventListener('load', function() {
     heroMediaContainer.innerHTML = ''; // Remove the image
     heroMediaContainer.appendChild(video);
   }
+
+  fixForGithub();
 });
 
 
