@@ -114,25 +114,30 @@
     <script>
       lucide.createIcons();
     </script>
+    
     <script>
     (function() {
-      if (!window.location.hostname.endsWith("github.io")) return; // Only run on GitHub
+      // Only run on GitHub Pages
+      if (!window.location.hostname.endsWith("github.io")) return;
 
       const repo = window.location.pathname.split('/')[1]; // first folder = repo name
 
-      // Fix CSS links
-      document.querySelectorAll('link[rel="stylesheet"], link[rel="preload"][as="style"]').forEach(link => {
-        if (link.getAttribute('href').startsWith('/')) {
-          link.href = `/${repo}${link.getAttribute('href')}`;
-        }
-      });
+      // Helper to fix elements with src or href attributes
+      const fixPath = (selector, attr) => {
+        document.querySelectorAll(selector).forEach(el => {
+          const val = el.getAttribute(attr);
+          if (val && val.startsWith('/')) {
+            el.setAttribute(attr, `/${repo}${val}`);
+          }
+        });
+      };
 
-      // Fix JS scripts
-      document.querySelectorAll('script[src]').forEach(script => {
-        if (script.getAttribute('src').startsWith('/')) {
-          script.src = `/${repo}${script.getAttribute('src')}`;
-        }
-      });
+      // Fix CSS
+      fixPath('link[rel="stylesheet"], link[rel="preload"][as="style"]', 'href');
+      // Fix JS
+      fixPath('script[src]', 'src');
+      // Fix images
+      fixPath('img[src]', 'src');
     })();
     </script>
 
