@@ -198,7 +198,20 @@
             // Fix CSS
             fixPath('link[rel="stylesheet"], link[rel="preload"][as="style"]', 'href');
             // Fix JS
-            fixPath('script[src]', 'src');
+            
+            // Fix JS (create new script tags)
+            document.querySelectorAll('script[src]').forEach(oldScript => {
+              const src = oldScript.getAttribute('src');
+              if (src && src.startsWith('/')) {
+                const newScript = document.createElement('script');
+                newScript.src = `/${repo}${src}`;
+                if (oldScript.type) newScript.type = oldScript.type;
+                if (oldScript.async) newScript.async = true;
+                if (oldScript.defer) newScript.defer = true;
+                document.head.appendChild(newScript);
+                oldScript.remove(); // optional: remove old script tag
+              }
+            });
             // Fix images
             fixPath('img[src]', 'src');
             function lateLoaded(){
