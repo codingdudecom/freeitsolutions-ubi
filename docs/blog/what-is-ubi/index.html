@@ -280,6 +280,8 @@ This is the most debated part of UBI. Common funding ideas include:
                 oldScript.remove(); // optional: remove old script tag
               }
             });
+            //Fix links
+            fixPath('a[href]', 'href');
             // Fix images
             fixPath('img[src]', 'src');
             function lateLoaded(){

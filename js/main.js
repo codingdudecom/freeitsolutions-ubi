@@ -27,7 +27,7 @@ function htmlDecode(input){
   return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
 }
 
-window.addEventListener('load', pageLoaded);
+window.addEventListener('load', window.pageLoaded);
 
 window.pageLoaded = function () {
   const heroMediaContainer = document.getElementById('hero-media');
