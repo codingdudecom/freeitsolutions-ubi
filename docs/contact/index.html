@@ -178,7 +178,7 @@
     <script>
       fixForGithub();
       function fixForGithub(){
-          pageLoaded();
+          
           (function() {
             // Only run on GitHub Pages
             if (!window.location.hostname.endsWith("github.io")) return;
@@ -201,8 +201,17 @@
             fixPath('script[src]', 'src');
             // Fix images
             fixPath('img[src]', 'src');
-            //Fix video
-            fixPath('video[src]', 'src');
+            function lateLoaded(){
+              if (typeof(pageLoaded) !== "undefined"){
+                pageLoaded();
+                //Fix video
+                fixPath('video[src]', 'src');
+              } else {
+                setTimeout(lateLoaded,1000);
+              }
+            }
+
+            lateLoaded();
           })();
       }
     </script>
