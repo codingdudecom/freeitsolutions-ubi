@@ -43,6 +43,12 @@ body {
   margin-left: 1rem;
 }
 
+.nav-masthead .nav-link a {
+  font-weight:100;
+  color: black;
+  text-decoration:none;
+}
+
 .nav-masthead .active {
   color: #fff;
   border-bottom-color: #fff;

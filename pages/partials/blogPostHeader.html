@@ -1,7 +1,12 @@
 <div class="cover-container mx-auto">
+{{#if category}}
+<div class="text-muted text-uppercase mb-2 small">
+    <i data-lucide="folder" class="me-1"></i>{{{categoryLinks category}}}
+</div>
+{{/if}}
 <h1 class="p-1">{{title}}</h1>
 <div class="d-flex flex-row gap-3 align-items-center mb-3">
-    {{#if author}}<span class="text-muted"><i data-lucide="user" class="me-1"></i><a href="{{authorUrl author}}" class="text-reset text-decoration-none">{{author}}</a></span>{{/if}}
+    {{#if author}}<span class="text-muted"><i data-lucide="user" class="me-1"></i><a href="{{authorUrl author}}" class="text-decoration-none">{{author}}</a></span>{{/if}}
     {{#if date}}<span class="text-muted"><i data-lucide="calendar" class="me-1"></i>{{date}}</span>{{/if}}
     {{#if tags}}<span class="text-muted"><i data-lucide="tag" class="me-1"></i>{{tags}}</span>{{/if}}
 </div>

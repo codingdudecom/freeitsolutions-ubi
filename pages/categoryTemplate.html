@@ -1,0 +1,34 @@
+{{>header
+    title=pageTitle
+    description=pageDescription
+    canonical=canonical
+    close="true"
+}}
+
+
+    {{#articleContent}}
+        <h1>{{pageTitle}}</h1>
+        <p>{{pageDescription}}</p>
+        <hr>
+        {{#each posts}}
+        <div class="blog-post mb-4">
+            {{#if featured_image}}
+            <a href="{{url}}">
+                <img src="{{featured_image}}" alt="{{image2alt featured_image}}" class="img-fluid rounded mb-3">
+            </a>
+            {{/if}}
+            <a href="{{url}}" class="text-decoration-none">
+                <h2 class="blog-post-title h3">{{title}}</h2>
+            </a>
+            <div class="d-flex flex-row gap-3 align-items-center mb-3">
+                {{#if author}}<span class="text-muted"><i data-lucide="user" class="me-1"></i><a href="{{authorUrl author}}" class="text-decoration-none">{{author}}</a></span>{{/if}}
+                {{#if date}}<span class="text-muted"><i data-lucide="calendar" class="me-1"></i>{{date}}</span>{{/if}}
+                {{#if tags}}<span class="text-muted"><i data-lucide="tag" class="me-1"></i>{{tags}}</span>{{/if}}
+            </div>
+            <p>{{description}}</p>
+        </div>
+        {{/each}}
+    {{/articleContent}}
+
+
+{{>footer}}

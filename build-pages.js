@@ -26,7 +26,7 @@ hbs.registerHelper('articleContent', function(options) {
 	var data = {};
 	buildBlogRoll(data);
 	var blogLatest = "";
-	if(!this.canonical.endsWith("/blog/")){
+	if(!this.canonical.endsWith("/articles/")){
 		blogLatest = template(data);
 	}
     return '<div class="text-dark no-shadow mt-5 pb-5 text-start justify-content-center row gx-0"><div class="col-10 col-sm-6 pe-sm-5">' + 
@@ -60,7 +60,62 @@ hbs.registerHelper('authorUrl', function(authorName) {
     return '/author/' + authorName.toLowerCase().replace(/\s+/g, '-');
 });
 
+hbs.registerHelper('categoryLinks', function(categoryStr) {
+    if (!categoryStr || typeof categoryStr !== 'string') {
+        return '';
+    }
+    const categories = categoryStr.split(',').map(c => c.trim());
+    const links = categories.map(category => {
+        if (!SITE_CATEGORIES.find(({name}) => category == name)){
+            return "";
+        }
+        const slug = category.toLowerCase().replace(/\s+/g, '-');
+        return `<a href="/${slug}/" class="text-decoration-none">${category}</a>`;
+    });
+    return new hbs.SafeString(links.join(', '));
+});
 
+hbs.registerHelper('categoryTopMenuLinks', function() {
+    const categories = SITE_CATEGORIES.map(({name}) => name);
+    const maxLinksInTopMenu = 3;
+    if (categories.length <= maxLinksInTopMenu) {
+        const links = categories.map(category => {
+            var cat = SITE_CATEGORIES.find(({name}) => category == name);
+            const slug = category.toLowerCase().replace(/\s+/g, '-');
+            cat.shortName && (category = cat.shortName);
+            return `<a class="nav-link" href="/${slug}/">${category}</a>`;
+        });
+        return new hbs.SafeString(links.join(' '));
+    } else {
+        const mainLinksCount = maxLinksInTopMenu-1;
+        const mainLinks = categories.slice(0, mainLinksCount).map(category => {
+            var cat = SITE_CATEGORIES.find(({name}) => category == name);
+            const slug = category.toLowerCase().replace(/\s+/g, '-');
+            cat.shortName && (category = cat.shortName);
+            return `<a class="nav-link" href="/${slug}/">${category}</a>`;
+        }).join(' ');
+
+        const dropdownLinks = categories.slice(mainLinksCount).map(category => {
+            var cat = SITE_CATEGORIES.find(({name}) => category == name);
+            const slug = category.toLowerCase().replace(/\s+/g, '-');
+            cat.shortName && (category = cat.shortName);
+            return `<li><a class="dropdown-item" href="/${slug}/">${category}</a></li>`;
+        }).join('');
+
+        const dropdown = `<div class="nav-link nav-item dropdown">
+    <a class="dropdown-toggle" href="#" id="exploreTopicsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Explore Topics
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="exploreTopicsDropdown">
+        ${dropdownLinks}
+        <li><hr /></li>
+        <li><a class="dropdown-item" href="/articles/">All Articles</a></li>
+    </ul>
+</div>`;
+        
+        return new hbs.SafeString(mainLinks + ' ' + dropdown);
+    }
+});
 
 hbs.registerHelper('slice', function(context, block) {
 
@@ -95,7 +150,7 @@ hbs.registerHelper('pagination', function(options) {
     
     // Previous button
     if (p.currentPage > 1) {
-        const prevUrl = p.currentPage === 2 ? '/blog/' : `${p.currentPage - 1}/`;
+        const prevUrl = p.currentPage === 2 ? '/articles/' : `${p.currentPage - 1}/`;
         html += `<li class="page-item">
             <a class="page-link" href="${prevUrl}" rel="prev" aria-label="Previous page">
                 <span aria-hidden="true">&laquo;</span> Previous
@@ -114,7 +169,7 @@ hbs.registerHelper('pagination', function(options) {
     // First page + ellipsis if needed
     if (startPage > 1) {
         html += `<li class="page-item">
-            <a class="page-link" href="/blog/">1</a>
+            <a class="page-link" href="/articles/">1</a>
         </li>`;
         if (startPage > 2) {
             html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
@@ -123,7 +178,7 @@ hbs.registerHelper('pagination', function(options) {
     
     // Current range of pages
     for (let i = startPage; i <= endPage; i++) {
-        const pageUrl = i === 1 ? '/blog/' : `/blog/${i}/`;
+        const pageUrl = i === 1 ? '/articles/' : `/articles/${i}/`;
         const isActive = i === p.currentPage;
         
         html += `<li class="page-item ${isActive ? 'active' : ''}">
@@ -137,7 +192,7 @@ hbs.registerHelper('pagination', function(options) {
             html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
         }
         html += `<li class="page-item">
-            <a class="page-link" href="/blog/${p.totalPages}/">${p.totalPages}</a>
+            <a class="page-link" href="/articles/${p.totalPages}/">${p.totalPages}</a>
         </li>`;
     }
     
@@ -268,8 +323,8 @@ var x = hbs.registerPartials(__dirname + '/pages/partials', function (err) {
 		]
 		files.map(file =>{
 			data.canonical = DOMAIN_FULL_URL + file.replace(/pages[\\|/]docs/g,'').replace("index.html","").replace(/\\/g,'/');
-			if (file.replace(/pages[\\|/]docs/g,'') == "\\blog\\index.html" || file.replace(/pages[\\|/]docs/g,'') == "/blog/index.html"){
-				//blogroll
+			if (file.replace(/pages[\\|/]docs/g,'') == "\\blog\\index.html" || file.replace(/pages[\\|/]docs/g,'') == "/articles/index.html"){
+				//articlesroll
 				buildBlogRoll(data);
 			}
 			var html = compile(__dirname+'/'+file,data);
@@ -282,10 +337,12 @@ var x = hbs.registerPartials(__dirname + '/pages/partials', function (err) {
 			fs.writeFileSync(__dirname+'/'+file.replace(/pages[\\|/]/g,''),html);
 		})
 
+		buildCategoryPages();
+
 		if (data.posts.length > 10){
 			var page = 2, totalPages = Math.ceil(data.posts.length / 10),totalPosts = data.posts.length;
 			while (page < totalPages+1){
-				var dir = __dirname+'/docs/blog/'+page;
+				var dir = __dirname+'/docs/articles/'+page;
 
 				if (!fs.existsSync(dir)){
 				    fs.mkdirSync(dir);
@@ -293,40 +350,57 @@ var x = hbs.registerPartials(__dirname + '/pages/partials', function (err) {
 
 				
 
-				var content = fs.readFileSync(__dirname+"/pages/docs/blog/index.html",'utf8');
+				var content = fs.readFileSync(__dirname+"/pages/docs/articles/index.html",'utf8');
 				content = content.replace(`{{>blogRoll offset="0" limit="10"}}`,`{{>blogRoll offset="${(page-1)*10}" limit="10"}}`);
 
 				content = content.replace(`{{pagination}}`,`{{pagination page="${page}"}}`);
 				var template = hbs.compile(content);
 
-				data.canonical = DOMAIN_FULL_URL + `/blog/${page}/`;
+				data.canonical = DOMAIN_FULL_URL + `/articles/${page}/`;
 				data.currentPage = page;
 				var html = template(data);
-				fs.writeFileSync(__dirname+'/docs/blog/'+page+"/index.html",html);
+				fs.writeFileSync(__dirname+'/docs/articles/'+page+"/index.html",html);
 				page++;
 			}
 		}
 	}
 });
 
-function buildBlogRoll(data){
-	var blogPostsDirs = getAllFolders('./pages/docs/blog');
-	data.posts = [];
-	blogPostsDirs.forEach(postId => {
-		var content = fs.readFileSync(__dirname+"/pages/docs/blog/"+postId+"/index.html",'utf8');
-		var re = new RegExp("\\{\\{>header.*?title='(.*?)'.*?description='(.*?)'.*?\\}\\}","sm");
-		var fi = content.match(new RegExp("\\{\\{>header.*?featured_image='(.*?)'.*?\\}\\}","sm"));
-		var date = content.match(new RegExp("\\{\\{>header.*?date='(.*?)'.*?\\}\\}","sm"));
-		data.posts.push({
-			title:content.match(re)[1],
-			url:'/blog/'+postId+'/',
-			description:content.match(re)[2],
-			featured_image:fi!=null?fi[1]:"",
-			date:date && new Date(date[1]).getTime()
-		})
-	});
+function getAllPostsWithMetadata() {
+    const blogPostsDirs = getAllFolders('./pages/docs/articles');
+    const posts = [];
+    blogPostsDirs.forEach(postId => {
+        const postPath = path.join(__dirname, "pages", "docs", "articles", postId, "index.html");
+        if (!fs.existsSync(postPath)) {
+            return;
+        }
+		const content = fs.readFileSync(postPath,'utf8');
+		const re = /\{\{>header.*?title='(.*?)'.*?description='(.*?)'.*?\}\}/s;
+        const match = content.match(re);
+        if (!match) return;
 
-	data.posts = data.posts.sort((a,b) => a.date<b.date?1:-1);
+		const fiMatch = content.match(/\{\{>header.*?featured_image='(.*?)'.*?\}\}/s);
+		const dateMatch = content.match(/\{\{>header.*?date='(.*?)'.*?\}\}/s);
+        const categoryMatch = content.match(/\{\{>header.*?category='(.*?)'.*?\}\}/s);
+        const authorMatch = content.match(/\{\{>header.*?author='(.*?)'.*?\}\}/s);
+        const tagsMatch = content.match(/\{\{>header.*?tags='(.*?)'.*?\}\}/s);
+
+		posts.push({
+			title: match[1],
+			url: '/articles/'+postId+'/',
+			description: match[2],
+			featured_image: fiMatch ? fiMatch[1] : "",
+			date: dateMatch ? new Date(dateMatch[1]).getTime() : null,
+            category: categoryMatch ? categoryMatch[1] : null,
+            author: authorMatch?authorMatch[1]:null,
+            tags: tagsMatch?tagsMatch[1]:null,
+		});
+	});
+    return posts.sort((a,b) => (b.date || 0) - (a.date || 0));
+}
+
+function buildBlogRoll(data){
+	data.posts = getAllPostsWithMetadata();
 
 	var page = data.currentPage || 1, totalPages = Math.ceil(data.posts.length / 10),totalPosts = data.posts.length;
 	data.pagination = {
@@ -369,4 +443,65 @@ const getAllFiles = function(dirPath, arrayOfFiles) {
   })
 
   return arrayOfFiles
+}
+
+
+const SITE_CATEGORIES = [
+    {
+        "shortName":"AI",
+        "name": "AI Artificial Intelligence",
+        "description": "Articles about artificial intelligence"
+    },
+    {
+        "name": "Sustainable Future",
+        "description": "Exploring bold ideas, ethical systems, and innovative policies shaping a fairer, more resilient world for all."
+    },
+    {
+        "name": "Circular Economy",
+        "description": "Redesigning how we make, use, and reuse resources to build a regenerative, waste-free economy."
+    },
+    {
+        "name": "Carbon Footprint",
+        "description": "Understanding, measuring, and reducing emissions to power the transition toward a low-carbon future."
+    },
+    {
+        "name": "Sustainable Living",
+        "description": "Embracing mindful choices, eco-friendly habits, and conscious consumption for a greener, balanced lifestyle."
+    },
+    {
+        "name": "Tech for the Future",
+        "description": "Harnessing innovation and AI to create smarter, sustainable, and more connected communities."
+    }
+];
+
+
+function buildCategoryPages(){
+    const allPosts = getAllPostsWithMetadata();
+
+    const categoryTemplateContent = fs.readFileSync(__dirname+"/pages/categoryTemplate.html",'utf8');
+    const categoryTemplate = hbs.compile(categoryTemplateContent);
+
+    SITE_CATEGORIES.forEach(category => {
+        const slug = category.name.toLowerCase().replace(/\s+/g, '-');
+        const dir = path.join(__dirname, 'docs', slug);
+
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        const categoryPosts = allPosts.filter(post => post.category && post.category.split(",").indexOf(category.name) >=0 );
+        categoryPosts.forEach(post => {
+            post.date = new Date(post.date).toISOString().split('T')[0];
+        })
+        const data = {
+            pageTitle: `${category.name}`,
+            pageDescription: category.description,
+            canonical: `${DOMAIN_FULL_URL}/${slug}/`,
+            posts: categoryPosts
+        };
+        
+        const html = categoryTemplate(data);
+
+        fs.writeFileSync(path.join(dir, 'index.html'), html);
+    });
 }

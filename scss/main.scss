@@ -10,7 +10,9 @@
 $mov:#d700a0;
 $gri:#dcdcdc;
 
-
+header{
+  z-index:1;
+}
 .home-hero{
   img, video {
     mix-blend-mode:darken;
@@ -237,8 +239,8 @@ a.logo{
 }
 
 .jssocials-shares{
-  a{
-    color:black!important;
+  .fab{
+    font-weight:100!important;
   }
 }
 
@@ -315,6 +317,7 @@ table {
   }
   .card {
     overflow:hidden;
+    flex:1;
   }
   a {
     color:black;
