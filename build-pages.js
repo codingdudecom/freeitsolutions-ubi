@@ -322,19 +322,27 @@ var x = hbs.registerPartials(__dirname + '/pages/partials', function (err) {
 			},
 		]
 		files.map(file =>{
-			data.canonical = DOMAIN_FULL_URL + file.replace(/pages[\\|/]docs/g,'').replace("index.html","").replace(/\\/g,'/');
-			if (file.replace(/pages[\\|/]docs/g,'') == "\\blog\\index.html" || file.replace(/pages[\\|/]docs/g,'') == "/articles/index.html"){
+            // 1. Normalize the path to use forward slashes regardless of OS
+            const normalizedFile = file.replace(/\\/g, '/');
+            const relativePath = normalizedFile.replace('pages/docs', '');
+
+            data.canonical = DOMAIN_FULL_URL + relativePath.replace("index.html", "");
+			
+            if (relativePath === "/blog/index.html" || relativePath === "/articles/index.html"){
 				//articlesroll
 				buildBlogRoll(data);
 			}
 			var html = compile(__dirname+'/'+file,data);
-			var dir = path.dirname(__dirname+'/'+file.replace(/pages[\\|/]/g,''));
+            // When writing the file, use path.join to ensure the OS handles the output path correctly
+            var outputFilePath = path.join(__dirname, file.replace(/pages[\\|/]/g, ''));
+			var dir = path.dirname(outputFilePath);
 
 			
 			if (!fs.existsSync(dir)){
 			    fs.mkdirSync(dir, { recursive: true });
 			}
-			fs.writeFileSync(__dirname+'/'+file.replace(/pages[\\|/]/g,''),html);
+
+			fs.writeFileSync(outputFilePath,html);
 		})
 
 		buildCategoryPages();
@@ -435,10 +443,13 @@ const getAllFiles = function(dirPath, arrayOfFiles) {
     if (file === '.DS_Store') {
       return;
     }
-    if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-      arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
+    // Use path.join correctly
+    let fullPath = path.join(dirPath, file);
+    
+    if (fs.statSync(fullPath).isDirectory()) {
+      arrayOfFiles = getAllFiles(fullPath, arrayOfFiles)
     } else {
-      arrayOfFiles.push(path.join( dirPath, "/", file))
+      arrayOfFiles.push(fullPath)
     }
   })
 
